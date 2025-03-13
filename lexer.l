@@ -4,26 +4,18 @@
 #include <string.h>
 #include "parser.tab.h"
 
-
-
-int num_line = 1;
-
-
-int op_attribute = 0; 
-
-
-int count_newlines(char *s) {
-    int count = 0;
-    while (*s) if (*s++ == '\n') count++;
-    return count;
-}
+int num_line = 1;  
 %}
+
+%option noyywrap
+
+%x COMMENT  
 
 %%
 
-
 [0-9]+ { 
-    printf("LEXER: Token NUM (%s)\n", yytext);  
+    printf("LEXER: Token NUM (%s)\n", yytext);
+    yylval.str = strdup(yytext);
     return NUM; 
 }
 
@@ -39,40 +31,65 @@ int count_newlines(char *s) {
 "switch"   { printf("LEXER: Token SWITCH\n"); return SWITCH; }
 "while"    { printf("LEXER: Token WHILE\n"); return WHILE; }
 
-
-[a-zA-Z_][a-zA-Z0-9_]* {
+[a-zA-Z_][a-zA-Z0-9_]* { 
     printf("LEXER: Token ID (%s)\n", yytext);
+    yylval.str = strdup(yytext);
     return ID;
 }
 
 ","  { printf("LEXER: Token COMMA\n"); return ','; }
 ":"  { printf("LEXER: Token COLON\n"); return COLON; }
 ";"  { printf("LEXER: Token SEMICOLON\n"); return SEMICOLON; }
+"("  { printf("LEXER: Token LPAREN\n"); return LPAREN; }
+")"  { printf("LEXER: Token RPAREN\n"); return RPAREN; }
+"{"  { printf("LEXER: Token LBRACE\n"); return LBRACE; }
+"}"  { printf("LEXER: Token RBRACE\n"); return RBRACE; }
+"="  { printf("LEXER: Token EQUAL\n"); return EQUAL; }
+
+"!"  { printf("LEXER: Token NOT\n"); return NOT; }
+"&&" { printf("LEXER: Token AND\n"); return AND; }
+"||" { printf("LEXER: Token OR\n"); return OR; }
+
+"cast<int>"|"cast<float>" { 
+    printf("LEXER: Token CAST (%s)\n", yytext);
+    yylval.str = strdup(yytext);
+    return CAST; 
+}
+
+"=="|"!="|"<"|">"|"<="|">=" { 
+    printf("LEXER: Token RELOP (%s)\n", yytext);
+    yylval.str = strdup(yytext);
+    return RELOP; 
+}
+
+"+"|"-" { 
+    printf("LEXER: Token ADDOP (%s)\n", yytext);
+    yylval.str = strdup(yytext);
+    return ADDOP; 
+}
+
+"*"|"/" { 
+    printf("LEXER: Token MULOP (%s)\n", yytext);
+    yylval.str = strdup(yytext);
+    return MULOP; 
+}
 
 
-"!"  { return NOT; }
-"&&" { return AND; }
-"||" { return OR; }
-"cast<int>"|"cast<float>" { return CAST; }
-"=="|"!="|"<"|">"|"<="|">=" { op_attribute = yytext[0]; return RELOP; }
-"(" { return LPAREN; }
-")" { return RPAREN; }
-"{" { return LBRACE; }
-"}" { return RBRACE; }
-":" { return COLON; }
-";" { return SEMICOLON; }
-"=" { return EQUAL; }
-"+"|"-" { op_attribute = yytext[0]; return ADDOP; }
-"*"|"/" { op_attribute = yytext[0]; return MULOP; }
+"/*" { BEGIN(COMMENT); }
 
+<COMMENT>[^*\n]* {  }
+<COMMENT>"*"+[^*/] {  }
+<COMMENT>"*"+"/" { BEGIN(INITIAL); }  
+<COMMENT>\n { num_line++; }  
 
-[ \t]+            { /* התעלמות מרווחים */ }
-[\n]+             { num_line += yyleng; }
-"/*"([^*]|\*+[^*/])*\*+"/" { num_line += count_newlines(yytext); }
+[ \t]+    {  }
+[\n]+     { num_line += yyleng; }
 
-
-. { printf("there is an un valid char %c in line %d", yytext[0], num_line);
-    return -1; }
+. { 
+    fprintf(stderr, "LEXER ERROR: תו לא חוקי '%c' בשורה %d\n", yytext[0], num_line);
+    return -1;
+}
 
 %%
-int yywrap() { return 0; }
+
+

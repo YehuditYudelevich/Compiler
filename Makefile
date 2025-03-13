@@ -5,6 +5,7 @@ TARGET = cpq
 LEXER_SRC = lexer.l
 PARSER_SRC = parser.y
 MAIN_SRC = main.c
+AST_SRC = ast.c  # 📌 הוספת קובץ ast.c
 
 # קבצי הפלט מ-Lex ו-Bison
 LEXER_C = lexer.c
@@ -30,8 +31,8 @@ $(LEXER_C): $(LEXER_SRC) $(PARSER_H)
 	flex -o $(LEXER_C) $(LEXER_SRC)
 
 # קומפילציה של כל הקבצים
-$(TARGET): $(LEXER_C) $(PARSER_C) $(MAIN_SRC)
-	$(CC) $(CFLAGS) -o $(TARGET) $(LEXER_C) $(PARSER_C) $(MAIN_SRC) $(LDFLAGS)
+$(TARGET): $(LEXER_C) $(PARSER_C) $(AST_SRC) $(MAIN_SRC)
+	$(CC) $(CFLAGS) -o $(TARGET) $(LEXER_C) $(PARSER_C) $(AST_SRC) $(MAIN_SRC) $(LDFLAGS)
 
 # ניקוי קבצים שנוצרו במהלך הקומפילציה
 clean:

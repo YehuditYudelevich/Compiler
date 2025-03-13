@@ -1,7 +1,8 @@
 #include "ast.h"
 
-// יצירת צומת חדש בעץ
+// create a new node in the AST
 ASTNode *createNode(NodeType type, char *value, ASTNode *left, ASTNode *right) {
+    printf("start createNode\n");
     ASTNode *node = (ASTNode *)malloc(sizeof(ASTNode));
     node->type = type;
     node->value = value ? strdup(value) : NULL;
@@ -11,7 +12,7 @@ ASTNode *createNode(NodeType type, char *value, ASTNode *left, ASTNode *right) {
     return node;
 }
 
-// הוספת צומת לרשימה (משמש לרשימות של פקודות)
+// append a new node to the end of a list
 ASTNode *appendNode(ASTNode *list, ASTNode *newNode) {
     if (!list) return newNode;
     ASTNode *temp = list;
@@ -20,7 +21,7 @@ ASTNode *appendNode(ASTNode *list, ASTNode *newNode) {
     return list;
 }
 
-// הדפסת עץ (לניפוי שגיאות ובדיקה)
+// print the AST (for debugging)
 void printAST(ASTNode *node, int indent) {
     if (!node) return;
     for (int i = 0; i < indent; i++) printf("  ");
@@ -30,7 +31,7 @@ void printAST(ASTNode *node, int indent) {
     printAST(node->next, indent);
 }
 
-// שחרור זיכרון של העץ
+// free the AST
 void freeAST(ASTNode *node) {
     if (!node) return;
     freeAST(node->left);

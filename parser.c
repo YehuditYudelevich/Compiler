@@ -71,6 +71,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "parser.tab.h"
 #include "ast.h"
 extern int yylex();
@@ -79,8 +80,12 @@ extern char *yytext;
 void yyerror(const char *s);
 ASTNode *root;
 
+// פונקציה שמונעת קריסת strdup אם NULL
+char* strdup_safe(const char *s) {
+    return s ? strdup(s) : strdup("UNKNOWN");
+}
 
-#line 84 "parser.c"
+#line 89 "parser.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -550,11 +555,11 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    29,    29,    38,    39,    42,    47,    48,    51,    52,
-      57,    61,    62,    66,    67,    68,    69,    70,    71,    72,
-      73,    77,    83,    88,    94,   100,   106,   112,   117,   118,
-     122,   123,   126,   127,   130,   131,   134,   135,   138,   139,
-     143,   144,   145,   146
+       0,    36,    36,    44,    45,    47,    52,    56,    61,    62,
+      64,    66,    67,    69,    70,    71,    72,    73,    74,    75,
+      76,    78,    83,    88,    93,   100,   106,   112,   117,   121,
+     123,   124,   126,   127,   129,   130,   132,   133,   135,   136,
+     138,   139,   140,   141
 };
 #endif
 
@@ -1177,281 +1182,302 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: declarations stmt_block  */
-#line 29 "parser.y"
+#line 36 "parser.y"
                                   { 
-    root=createNode(NODE_PROGRAM, "program", (yyvsp[-1].node), (yyvsp[0].node));
-    printf("AST succeess!\n");
-    printAST(root,0);
+    printf("[DEBUG] Creating program node\n");
+    root = createNode(NODE_PROGRAM, "program", (yyvsp[-1].node), (yyvsp[0].node));
+    printf("\U0001F44C AST נבנה בהצלחה!\n");
+    printAST(root, 0);
     (yyval.node) = root;
-
 }
-#line 1189 "parser.c"
+#line 1194 "parser.c"
     break;
 
   case 3: /* declarations: declarations declaration  */
-#line 38 "parser.y"
+#line 44 "parser.y"
                                         { (yyval.node) = appendNode((yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1195 "parser.c"
+#line 1200 "parser.c"
     break;
 
   case 4: /* declarations: %empty  */
-#line 39 "parser.y"
+#line 45 "parser.y"
                { (yyval.node) = NULL; }
-#line 1201 "parser.c"
+#line 1206 "parser.c"
     break;
 
   case 5: /* declaration: idlist COLON type SEMICOLON  */
-#line 42 "parser.y"
-                                         {
-    (yyval.node) = createNode(NODE_DECLARATION, (yyvsp[-1].node), (yyvsp[-3].node), NULL);
-}
-#line 1209 "parser.c"
-    break;
-
-  case 6: /* idlist: idlist ',' ID  */
 #line 47 "parser.y"
-                       { (yyval.node) = appendNode((yyvsp[-2].node), createNode(NODE_ID, (yyvsp[0].str), NULL, NULL)); }
+                                          {
+    printf("[DEBUG] Creating declaration node (%s)\n", (yyvsp[-1].str));
+    (yyval.node) = createNode(NODE_DECLARATION, strdup_safe((yyvsp[-1].str)), (yyvsp[-3].node), NULL);
+}
 #line 1215 "parser.c"
     break;
 
-  case 7: /* idlist: ID  */
-#line 48 "parser.y"
-            { (yyval.node) = createNode(NODE_ID, (yyvsp[0].str), NULL, NULL); }
-#line 1221 "parser.c"
-    break;
-
-  case 8: /* type: INT  */
-#line 51 "parser.y"
-           { (yyval.node) = NULL; }
-#line 1227 "parser.c"
-    break;
-
-  case 9: /* type: FLOAT  */
+  case 6: /* idlist: idlist ',' ID  */
 #line 52 "parser.y"
-             { (yyval.node) = NULL; }
+                       { 
+    printf("[DEBUG] Appending ID: %s\n", (yyvsp[0].str));
+    (yyval.node) = appendNode((yyvsp[-2].node), createNode(NODE_ID, strdup_safe((yyvsp[0].str)), NULL, NULL)); 
+}
+#line 1224 "parser.c"
+    break;
+
+  case 7: /* idlist: ID  */
+#line 56 "parser.y"
+            { 
+    printf("[DEBUG] Creating ID node: %s\n", (yyvsp[0].str));
+    (yyval.node) = createNode(NODE_ID, strdup_safe((yyvsp[0].str)), NULL, NULL); 
+}
 #line 1233 "parser.c"
     break;
 
-  case 10: /* stmt_block: LBRACE stmtlist RBRACE  */
-#line 57 "parser.y"
-                                    { (yyval.node) = createNode(NODE_STMT_BLOCK, "stmt_block", (yyvsp[-1].node), NULL); }
+  case 8: /* type: INT  */
+#line 61 "parser.y"
+           { (yyval.str) = strdup("int"); }
 #line 1239 "parser.c"
     break;
 
-  case 11: /* stmtlist: stmtlist stmt  */
-#line 61 "parser.y"
-                         { (yyval.node) = appendNode((yyvsp[-1].node), (yyvsp[0].node)); }
+  case 9: /* type: FLOAT  */
+#line 62 "parser.y"
+             { (yyval.str) = strdup("float"); }
 #line 1245 "parser.c"
     break;
 
-  case 12: /* stmtlist: %empty  */
-#line 62 "parser.y"
-           { (yyval.node) = NULL; }
+  case 10: /* stmt_block: LBRACE stmtlist RBRACE  */
+#line 64 "parser.y"
+                                    { (yyval.node) = createNode(NODE_STMT_BLOCK, "stmt_block", (yyvsp[-1].node), NULL); }
 #line 1251 "parser.c"
     break;
 
-  case 13: /* stmt: assignment_stmt  */
+  case 11: /* stmtlist: stmtlist stmt  */
 #line 66 "parser.y"
-                        { (yyval.node) = (yyvsp[0].node); }
+                         { (yyval.node) = appendNode((yyvsp[-1].node), (yyvsp[0].node)); }
 #line 1257 "parser.c"
     break;
 
-  case 14: /* stmt: input_stmt  */
+  case 12: /* stmtlist: %empty  */
 #line 67 "parser.y"
-                  { (yyval.node) = (yyvsp[0].node); }
+           { (yyval.node) = NULL; }
 #line 1263 "parser.c"
     break;
 
-  case 15: /* stmt: output_stmt  */
-#line 68 "parser.y"
-                   { (yyval.node) = (yyvsp[0].node); }
+  case 13: /* stmt: assignment_stmt  */
+#line 69 "parser.y"
+                       { (yyval.node) = (yyvsp[0].node); }
 #line 1269 "parser.c"
     break;
 
-  case 16: /* stmt: if_stmt  */
-#line 69 "parser.y"
-               { (yyval.node) = (yyvsp[0].node); }
+  case 14: /* stmt: input_stmt  */
+#line 70 "parser.y"
+                  { (yyval.node) = (yyvsp[0].node); }
 #line 1275 "parser.c"
     break;
 
-  case 17: /* stmt: while_stmt  */
-#line 70 "parser.y"
-                  { (yyval.node) = (yyvsp[0].node); }
+  case 15: /* stmt: output_stmt  */
+#line 71 "parser.y"
+                   { (yyval.node) = (yyvsp[0].node); }
 #line 1281 "parser.c"
     break;
 
-  case 18: /* stmt: switch_stmt  */
-#line 71 "parser.y"
-                   { (yyval.node) = (yyvsp[0].node); }
+  case 16: /* stmt: if_stmt  */
+#line 72 "parser.y"
+               { (yyval.node) = (yyvsp[0].node); }
 #line 1287 "parser.c"
     break;
 
-  case 19: /* stmt: break_stmt  */
-#line 72 "parser.y"
+  case 17: /* stmt: while_stmt  */
+#line 73 "parser.y"
                   { (yyval.node) = (yyvsp[0].node); }
 #line 1293 "parser.c"
     break;
 
-  case 20: /* stmt: stmt_block  */
-#line 73 "parser.y"
-                  { (yyval.node) = (yyvsp[0].node); }
+  case 18: /* stmt: switch_stmt  */
+#line 74 "parser.y"
+                   { (yyval.node) = (yyvsp[0].node); }
 #line 1299 "parser.c"
     break;
 
+  case 19: /* stmt: break_stmt  */
+#line 75 "parser.y"
+                  { (yyval.node) = (yyvsp[0].node); }
+#line 1305 "parser.c"
+    break;
+
+  case 20: /* stmt: stmt_block  */
+#line 76 "parser.y"
+                  { (yyval.node) = (yyvsp[0].node); }
+#line 1311 "parser.c"
+    break;
+
   case 21: /* assignment_stmt: ID EQUAL expression SEMICOLON  */
-#line 77 "parser.y"
-                                               {
-     (yyval.node) = createNode(NODE_ASSIGNMENT, (yyvsp[-3].str), createNode(NODE_ID, (yyvsp[-3].str), NULL, NULL), (yyvsp[-1].node));
+#line 78 "parser.y"
+                                                {
+     printf("[DEBUG] Creating assignment: %s = ...\n", (yyvsp[-3].str));
+     (yyval.node) = createNode(NODE_ASSIGNMENT, strdup_safe((yyvsp[-3].str)), createNode(NODE_ID, strdup_safe((yyvsp[-3].str)), NULL, NULL), (yyvsp[-1].node));
 }
-#line 1307 "parser.c"
+#line 1320 "parser.c"
     break;
 
   case 22: /* input_stmt: INPUT LPAREN ID RPAREN SEMICOLON  */
 #line 83 "parser.y"
-                                             {
-    (yyval.node) = createNode(NODE_INPUT, (yyvsp[-2].str), NULL, NULL);
+                                              {
+    printf("[DEBUG] Creating input statement for: %s\n", (yyvsp[-2].str));
+    (yyval.node) = createNode(NODE_INPUT, strdup_safe((yyvsp[-2].str)), NULL, NULL);
 }
-#line 1315 "parser.c"
+#line 1329 "parser.c"
     break;
 
   case 23: /* output_stmt: OUTPUT LPAREN expression RPAREN SEMICOLON  */
 #line 88 "parser.y"
-                                                       {
+                                                        {
+    printf("[DEBUG] Creating output statement\n");
     (yyval.node) = createNode(NODE_OUTPUT, NULL, (yyvsp[-2].node), NULL);
 }
-#line 1323 "parser.c"
+#line 1338 "parser.c"
     break;
 
   case 24: /* if_stmt: IF LPAREN boolexpr RPAREN stmt ELSE stmt  */
-#line 94 "parser.y"
-                                                  {
-    (yyval.node) = createNode(NODE_IF, NULL, (yyvsp[-4].node), createNode(NODE_STMT_BLOCK, "if-else", (yyvsp[-2].node), (yyvsp[0].node)));
+#line 93 "parser.y"
+                                                   {
+    printf("[DEBUG] Creating if-else statement\n");
+    (yyval.node) = createNode(NODE_IF, "if-else", (yyvsp[-4].node), 
+                    createNode(NODE_STMT_BLOCK, "if-body", (yyvsp[-2].node) ? (yyvsp[-2].node) : createNode(NODE_EMPTY, "EMPTY_BLOCK", NULL, NULL),
+                                                        (yyvsp[0].node) ? (yyvsp[0].node) : createNode(NODE_EMPTY, "EMPTY_BLOCK", NULL, NULL)));
 }
-#line 1331 "parser.c"
+#line 1349 "parser.c"
     break;
 
   case 25: /* while_stmt: WHILE LPAREN boolexpr RPAREN stmt  */
 #line 100 "parser.y"
-                                              {
-    (yyval.node) = createNode(NODE_WHILE, NULL, (yyvsp[-2].node), (yyvsp[0].node));
+                                               {
+    printf("[DEBUG] Creating while loop\n");
+    (yyval.node) = createNode(NODE_WHILE, "while-loop", (yyvsp[-2].node), 
+                    (yyvsp[0].node) ? (yyvsp[0].node) : createNode(NODE_EMPTY, "EMPTY_BLOCK", NULL, NULL));
 }
-#line 1339 "parser.c"
+#line 1359 "parser.c"
     break;
 
   case 26: /* switch_stmt: SWITCH LPAREN expression RPAREN LBRACE caselist DEFAULT COLON stmtlist RBRACE  */
 #line 106 "parser.y"
-                                                                                           {
-    (yyval.node) = createNode(NODE_SWITCH, NULL, (yyvsp[-7].node), appendNode((yyvsp[-4].node), createNode(NODE_CASE, "default", (yyvsp[-1].node), NULL)));
+                                                                                            {
+    printf("[DEBUG] Creating switch statement\n");
+    (yyval.node) = createNode(NODE_SWITCH, "switch", (yyvsp[-7].node), 
+                    appendNode((yyvsp[-4].node), createNode(NODE_CASE, "default", (yyvsp[-1].node) ? (yyvsp[-1].node) : createNode(NODE_EMPTY, "EMPTY_BLOCK", NULL, NULL), NULL)));
 }
-#line 1347 "parser.c"
+#line 1369 "parser.c"
     break;
 
   case 27: /* break_stmt: BREAK SEMICOLON  */
 #line 112 "parser.y"
-                            {
+                             {
+    printf("[DEBUG] Creating break statement\n");
     (yyval.node) = createNode(NODE_BREAK, "break", NULL, NULL); 
 }
-#line 1355 "parser.c"
+#line 1378 "parser.c"
     break;
 
   case 28: /* caselist: caselist CASE NUM COLON stmtlist  */
 #line 117 "parser.y"
-                                            { (yyval.node) = appendNode((yyvsp[-4].node), createNode(NODE_CASE, (yyvsp[-2].str), (yyvsp[0].node), NULL)); }
-#line 1361 "parser.c"
+                                            { 
+    printf("[DEBUG] Creating case: %s\n", (yyvsp[-2].str));
+    (yyval.node) = appendNode((yyvsp[-4].node), createNode(NODE_CASE, strdup_safe((yyvsp[-2].str)), (yyvsp[0].node) ? (yyvsp[0].node) : createNode(NODE_EMPTY, "EMPTY_BLOCK", NULL, NULL), NULL)); 
+}
+#line 1387 "parser.c"
     break;
 
   case 29: /* caselist: %empty  */
-#line 118 "parser.y"
+#line 121 "parser.y"
            { (yyval.node) = NULL; }
-#line 1367 "parser.c"
+#line 1393 "parser.c"
     break;
 
   case 30: /* boolexpr: boolexpr OR boolterm  */
-#line 122 "parser.y"
-                                { (yyval.node) = createNode(NODE_EXPR, strdup((yyvsp[-1].str)), (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1373 "parser.c"
+#line 123 "parser.y"
+                                { (yyval.node) = createNode(NODE_EXPR, strdup_safe((yyvsp[-1].str)), (yyvsp[-2].node), (yyvsp[0].node)); }
+#line 1399 "parser.c"
     break;
 
   case 31: /* boolexpr: boolterm  */
-#line 123 "parser.y"
+#line 124 "parser.y"
                     { (yyval.node) = (yyvsp[0].node); }
-#line 1379 "parser.c"
+#line 1405 "parser.c"
     break;
 
   case 32: /* boolterm: boolterm AND boolfactor  */
 #line 126 "parser.y"
-                                   { (yyval.node) = createNode(NODE_EXPR, strdup((yyvsp[-1].str)), (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1385 "parser.c"
+                                   { (yyval.node) = createNode(NODE_EXPR, strdup_safe((yyvsp[-1].str)), (yyvsp[-2].node), (yyvsp[0].node)); }
+#line 1411 "parser.c"
     break;
 
   case 33: /* boolterm: boolfactor  */
 #line 127 "parser.y"
                       { (yyval.node) = (yyvsp[0].node); }
-#line 1391 "parser.c"
+#line 1417 "parser.c"
     break;
 
   case 34: /* boolfactor: NOT LPAREN boolexpr RPAREN  */
-#line 130 "parser.y"
-                                        { (yyval.node) = createNode(NODE_EXPR, strdup((yyvsp[-3].str)), (yyvsp[-1].node), NULL); }
-#line 1397 "parser.c"
+#line 129 "parser.y"
+                                        { (yyval.node) = createNode(NODE_EXPR, strdup_safe((yyvsp[-3].str)), (yyvsp[-1].node), NULL); }
+#line 1423 "parser.c"
     break;
 
   case 35: /* boolfactor: expression RELOP expression  */
-#line 131 "parser.y"
-                                         { (yyval.node) = createNode(NODE_EXPR, strdup((yyvsp[-1].str)), (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1403 "parser.c"
+#line 130 "parser.y"
+                                         { (yyval.node) = createNode(NODE_EXPR, strdup_safe((yyvsp[-1].str)), (yyvsp[-2].node), (yyvsp[0].node)); }
+#line 1429 "parser.c"
     break;
 
   case 36: /* expression: expression ADDOP term  */
-#line 134 "parser.y"
-                                   { (yyval.node) = createNode(NODE_EXPR, strdup((yyvsp[-1].str)), (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1409 "parser.c"
+#line 132 "parser.y"
+                                   { (yyval.node) = createNode(NODE_EXPR, strdup_safe((yyvsp[-1].str)), (yyvsp[-2].node), (yyvsp[0].node)); }
+#line 1435 "parser.c"
     break;
 
   case 37: /* expression: term  */
-#line 135 "parser.y"
+#line 133 "parser.y"
                   { (yyval.node) = (yyvsp[0].node); }
-#line 1415 "parser.c"
+#line 1441 "parser.c"
     break;
 
   case 38: /* term: term MULOP factor  */
-#line 138 "parser.y"
-                         { (yyval.node) = createNode(NODE_EXPR, strdup((yyvsp[-1].str)), (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1421 "parser.c"
+#line 135 "parser.y"
+                         { (yyval.node) = createNode(NODE_EXPR, strdup_safe((yyvsp[-1].str)), (yyvsp[-2].node), (yyvsp[0].node)); }
+#line 1447 "parser.c"
     break;
 
   case 39: /* term: factor  */
-#line 139 "parser.y"
+#line 136 "parser.y"
               { (yyval.node) = (yyvsp[0].node); }
-#line 1427 "parser.c"
+#line 1453 "parser.c"
     break;
 
   case 40: /* factor: LPAREN expression RPAREN  */
-#line 143 "parser.y"
+#line 138 "parser.y"
                                   { (yyval.node) = (yyvsp[-1].node); }
-#line 1433 "parser.c"
+#line 1459 "parser.c"
     break;
 
   case 41: /* factor: CAST LPAREN expression RPAREN  */
-#line 144 "parser.y"
+#line 139 "parser.y"
                                        { (yyval.node) = createNode(NODE_EXPR, "cast", (yyvsp[-1].node), NULL); }
-#line 1439 "parser.c"
+#line 1465 "parser.c"
     break;
 
   case 42: /* factor: ID  */
-#line 145 "parser.y"
-            { (yyval.node) = createNode(NODE_ID, (yyvsp[0].str), NULL, NULL); }
-#line 1445 "parser.c"
+#line 140 "parser.y"
+            { (yyval.node) = createNode(NODE_ID, strdup_safe((yyvsp[0].str)), NULL, NULL); }
+#line 1471 "parser.c"
     break;
 
   case 43: /* factor: NUM  */
-#line 146 "parser.y"
-              { (yyval.node) = createNode(NODE_NUM, (yyvsp[0].str), NULL, NULL); }
-#line 1451 "parser.c"
+#line 141 "parser.y"
+             { (yyval.node) = createNode(NODE_NUM, strdup_safe((yyvsp[0].str)), NULL, NULL); }
+#line 1477 "parser.c"
     break;
 
 
-#line 1455 "parser.c"
+#line 1481 "parser.c"
 
       default: break;
     }
@@ -1644,10 +1670,10 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 149 "parser.y"
+#line 143 "parser.y"
 
 
 void yyerror(const char *s) {
-    fprintf(stderr, "Syntax error at line %d: %s\n", yylineno, s);
+    fprintf(stderr, "\U0001F6A8 Syntax error at line %d: %s\n", yylineno, s);
     fprintf(stderr, "Last token read: '%s'\n", yytext);
 }

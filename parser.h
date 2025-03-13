@@ -89,10 +89,10 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 13 "parser.y"
+#line 19 "parser.y"
 
-    char *str;          // עבור מזהים ומספרים
-    struct ASTNode *node; // עבור צמתים ב-AST
+    char *str;         
+    struct ASTNode *node; 
 
 #line 98 "parser.h"
 
