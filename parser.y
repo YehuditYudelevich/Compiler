@@ -135,10 +135,18 @@ expression : expression ADDOP term { $$ = createNode(NODE_EXPR, strdup_safe($2),
 term : term MULOP factor { $$ = createNode(NODE_EXPR, strdup_safe($2), $1, $3); }
      | factor { $$ = $1; };
 
-factor : LPAREN expression RPAREN { $$ = $2; }
+factor : ADDOP factor {
+            if (strcmp($1, "-") == 0) {
+                $$ = createNode(NODE_EXPR, "-", $2, NULL);
+            } else {
+                $$ = $2; 
+            }
+        }
+       | LPAREN expression RPAREN { $$ = $2; }
        | CAST LPAREN expression RPAREN { $$ = createNode(NODE_EXPR, "cast", $3, NULL); }
        | ID { $$ = createNode(NODE_ID, strdup_safe($1), NULL, NULL); }
        | NUM { $$ = createNode(NODE_NUM, strdup_safe($1), NULL, NULL); };
+
 
 %%
 

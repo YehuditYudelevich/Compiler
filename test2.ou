@@ -1,0 +1,17 @@
+a, b: int;
+{
+    a = 3;
+    b = 3;
+
+    if (a == b)
+        output(a * 2);
+    else
+        output(b * 2);
+
+    switch (a + b) {
+        case 4: output(100);
+        case 6: output(200);
+        default: output(-1);
+    }
+}
+
