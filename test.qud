@@ -1,0 +1,14 @@
+1 RINP a
+2 RINP b
+3 RLSS less a b
+4 JMPZ L0 t0
+5 RPRT a
+6 JUMP L1
+7 L0:
+8 RPRT b
+9 L1:
+10 RPRT a
+11 RPRT a
+12 RPRT b
+13 RPRT b
+14 RINP a

@@ -1,16 +1,10 @@
-x, y: int;
+a, b: float;
 {
-    x = 5;
-    y = 10;
-
-    if (x < y)
-        output(x);
+    input(a);
+    input(b);
+    if (a < b)
+    output(a);
     else
-        output(y);
-
-    switch (x) {
-        case 1: output(x);
-        case 2: output(y);
-        default: output(0);
-    }
+    output(b);
 }
+    

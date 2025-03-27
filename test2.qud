@@ -1,0 +1,25 @@
+1 RASN a 3
+2 RASN b 3
+3 REQL equal a b
+4 JMPZ (null) equal
+5 JMPZ L0 t0
+6 RMLT t1 a 2
+7 RPRT t1
+8 JUMP L1
+9 L0:
+10 RMLT t2 b 2
+11 RPRT t2
+12 L1:
+13 RMLT t3 a 2
+14 RPRT t3
+15 RMLT t4 a 2
+16 RPRT t4
+17 RMLT t5 b 2
+18 RPRT t5
+19 RMLT t6 b 2
+20 RPRT t6
+21 RPRT 100
+22 RPRT 200
+23 RSUB t7 1 (null)
+24 RPRT t7
+25 RASN a 3

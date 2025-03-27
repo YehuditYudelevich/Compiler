@@ -2,7 +2,7 @@
 
 // create a new node in the AST
 ASTNode *createNode(NodeType type, char *value, ASTNode *left, ASTNode *right) {
-    printf("start createNode\n");
+    printf("Creating node with type: %d, value: %s\n", type, value ? value : "NULL");
     ASTNode *node = (ASTNode *)malloc(sizeof(ASTNode));
     node->type = type;
     node->value = value ? strdup(value) : NULL;
@@ -12,6 +12,7 @@ ASTNode *createNode(NodeType type, char *value, ASTNode *left, ASTNode *right) {
     return node;
 }
 
+
 // append a new node to the end of a list
 ASTNode *appendNode(ASTNode *list, ASTNode *newNode) {
     if (!list) return newNode;
@@ -20,6 +21,9 @@ ASTNode *appendNode(ASTNode *list, ASTNode *newNode) {
     temp->next = newNode;
     return list;
 }
+
+
+
 
 // print the AST (for debugging)
 void printAST(ASTNode *node, int indent) {
